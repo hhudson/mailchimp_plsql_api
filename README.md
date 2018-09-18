@@ -28,7 +28,7 @@ select apex_web_service.make_rest_request(
     ) from dual;
 
 ```
-If you get the error 'ORA-29024: Certificate validation failure', it must be because you have not imported the certificate chain referenced above to your linked oracle wallet. For greater details on how I configured my Oracle Wallet : 
+If you get the error 'ORA-29024: Certificate validation failure', it must be because you have not imported the certificate chain referenced above to your linked oracle wallet. See my notes on [how I configured my Oracle Wallet](docs/Create_oracle_wallet.md). 
 
 If you get the error 'ORA-24263: Certificate of the remote server does not match the target address.', it must mean that you are on a 12.2 database (or higher) and you need to add a parameter to your request:
 ```
@@ -39,7 +39,7 @@ select apex_web_service.make_rest_request(
     , p_https_host  => 'wildcardsan2.mailchimp.com'
     ) from dual;
 ```
-The 'HTTPS Host' refers to 'Common Name' of the URL you are trying to reach and must now be specified when it does not match the destination URL. For more details on this error : 
+The 'HTTPS Host' refers to 'Common Name' of the URL you are trying to reach and must now be specified when it does not match the destination URL. See my notes on [solving the ORA-24263 error](docs/Certificate_of_the_remote_server_does_not_match_the_target_address.md). 
 
 ## Install Logger
 
@@ -56,7 +56,7 @@ Your 1st step should be to create a free account on [Mailchimp](https://mailchim
 You can create and manage your API keys in the account section of MailChimp.
 <h1 align="center">
       <br>
-      <img src="https://raw.githubusercontent.com/hhudson/mailchimp_plsql_api/master/docs/img/api_key.png" alt="APEX Nitro" width="600">
+      <img src="https://raw.githubusercontent.com/hhudson/mailchimp_plsql_api/master/docs/img/api_key.png" alt="MailChimp API Keys" width="600">
       <br>
       <br>
 </h1>
@@ -68,22 +68,47 @@ You'll need to determine your 'URL prefix', as I'm calling it, to use the MailCh
 
 With your URL prefix and API key, you can now begin populating the global variables listed at the top of the 
 ### Authenticate your email with MailChimp
+<h1 align="center">
+      <br>
+      <img src="https://raw.githubusercontent.com/hhudson/mailchimp_plsql_api/master/docs/img/authenticate_email.png" alt="Authenticate your email" width="600">
+      <br>
+      <br>
+</h1>
+
 ## Create an email list
 ### Add subscribers
 ### View your subscribers
 ## Prepare your email
 ## Create an email template
 ### Option 1: Create template with MailChimp GUI
+<h1 align="center">
+      <br>
+      <img src="https://raw.githubusercontent.com/hhudson/mailchimp_plsql_api/master/docs/img/template_gui.png" alt="MailChimp GUI" width="600">
+      <br>
+      <br>
+</h1>
 ### Option 2: Create template with API
 ## Pass data into your template with API
 ### Option 1: Update entire template html
 ### Option 2: Use Merge Fields
-#### Add Merge Field to your template
-#### Add Merge Field to your list
+#### Add Merge Field(s) to your template
+<h1 align="center">
+      <br>
+      <img src="https://raw.githubusercontent.com/hhudson/mailchimp_plsql_api/master/docs/img/template_substitutions.png" alt="Template Merge Fields" width="600">
+      <br>
+      <br>
+</h1>
+#### Add Merge Field(s) to your list
 #### Assign value to Merge Field
 #### Review Merge Fields
 ## Send your email
 ### Generate campaign url
 ### Send campaign
+<h1 align="center">
+      <br>
+      <img src="https://raw.githubusercontent.com/hhudson/mailchimp_plsql_api/master/docs/img/final_email.png" alt="Final Email" width="600">
+      <br>
+      <br>
+</h1>
 
 
