@@ -72,7 +72,7 @@ While you're there, be sure to authenticate the email you intend to have as your
       <br>
       <br>
 </h1>
-### Populate values in package
+###Populate values in package
 
 With your URL prefix and API key, you can now begin populating the global variables listed at the top of the [blog_mailchimp_pkg body](source/packages/mailchimp_pkg.pkb).
 ```
