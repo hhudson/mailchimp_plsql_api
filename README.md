@@ -79,12 +79,13 @@ While you're there, be sure to authenticate the email you intend to have as your
 With your URL prefix and API key, you can now begin populating the global variables listed at the top of the [blog_mailchimp_pkg body](source/packages/mailchimp_pkg.pkb).
 ```
 g_url_prefix    constant varchar2(100):= 'https://usXX.api.mailchimp.com/3.0/';
-g_company_name  constant varchar2(100):= '[Your organization]'; 
-g_reply_to      constant varchar2(100):= '[The email you athenticated with MailChimp]'; 
-g_from_name     constant varchar2(100):= '[Your name]';
 g_password      constant varchar2(50) := '[your MailChimp API Key]';
 g_wallet_path   constant varchar2(100):= 'file:[path to your Oracle Wallet]';
 g_https_host    constant varchar2(100):= 'wildcardsan2.mailchimp.com';
+g_company_name  constant varchar2(100):= '[Your organization]'; 
+g_reply_to      constant varchar2(100):= '[The email you athenticated with MailChimp]'; 
+g_from_name     constant varchar2(100):= '[Your name]';
+...
 ```
 
 

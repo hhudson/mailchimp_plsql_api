@@ -1,15 +1,19 @@
 create or replace package body blog_mailchimp_pkg as 
     
-    gc_scope_prefix constant varchar2(31) := lower($$plsql_unit) || '.'; --------------- necessary for the logger implementation
-    g_url_prefix    constant varchar2(100):= 'https://usXX.api.mailchimp.com/3.0/'; ---- your Mailchimp url prefix (see instructions)
-    g_company_name  constant varchar2(100):= 'My Company'; ----------------------------- whatever your organization is called
-    g_reply_to      constant varchar2(100):= 'hhudson@insum.ca'; ----------------------- the email that you've authenticated with Mailchimp
-    g_from_name     constant varchar2(100):= 'Hayden Hudson'; -------------------------- the name your emails will appear to be from
-    g_username      constant varchar2(50) := 'admin'; ---------------------------------- arbitrary - can be anything
-    g_password      constant varchar2(50) := '[your MailChimp API Key]'; --------------- this is your API Key (very sensitive - keep to yourself)
-    g_wallet_path   constant varchar2(100):= 'file:[path to your Oracle Wallet]'; ------ the path on to your Oracle Wallet
-    g_https_host    constant varchar2(100):= 'wildcardsan2.mailchimp.com'; ------------- necessary if you have an Oracle 12.2 database or higher (see instructions)
-
+    gc_scope_prefix constant varchar2(31) := lower($$plsql_unit) || '.'; ---------------- necessary for the logger implementation
+    g_url_prefix    constant varchar2(100):= 'https://us[XX].api.mailchimp.com/3.0/'; --- your Mailchimp url prefix
+    g_username      constant varchar2(50) := 'admin'; ----------------------------------- arbitrary - can be anything
+    g_password      constant varchar2(50) := '[your MailChimp API Key]'; ---------------- this is your API Key (very sensitive - keep to yourself)
+    g_wallet_path   constant varchar2(100):= 'file:[path to your Oracle Wallet]'; ------- the path on to your Oracle Wallet
+    g_https_host    constant varchar2(100):= 'wildcardsan2.mailchimp.com'; -------------- necessary if you have an Oracle 12.2 database or higher (see instructions)
+    g_address1      constant varchar2(500):= '27 West St'; ------------------------------ The CAN SPAM act requires that you specify the organization's address
+    g_city          constant varchar2(500):= 'Cambridge'; ------------------------------- The CAN SPAM act requires that you specify the organization's address
+    g_state         constant varchar2(500):= 'MA'; -------------------------------------- The CAN SPAM act requires that you specify the organization's address
+    g_zip           constant varchar2(500):= '02139'; ----------------------------------- The CAN SPAM act requires that you specify the organization's address
+    g_county        constant varchar2(500):= 'U.S.A.'; ---------------------------------- The CAN SPAM act requires that you specify the organization's address
+    g_company_name  constant varchar2(100):= 'My Company'; ------------------------------ whatever your organization is called
+    g_reply_to      constant varchar2(100):= 'hhudson@insum.ca'; ------------------------ the email that you've authenticated with Mailchimp
+    g_from_name     constant varchar2(100):= 'Hayden Hudson'; --------------------------- the name your emails will appear to be from
 
 -- see package specs
 function create_list (p_list_name           in varchar2, 
@@ -27,8 +31,9 @@ begin
   logger.append_param(l_params, 'p_permission_reminder', p_permission_reminder);
   logger.log('START', l_scope, null, l_params);
 
-    l_body := '{"name":"'||p_list_name||'","contact":{"company":"'||g_company_name||'","address1":"","city":"","state":"","zip":"","country":"","phone":""},"permission_reminder":"'||p_permission_reminder||'","campaign_defaults":{"from_name":"'||g_from_name||'''","from_email":"'||g_reply_to||'","subject":"","language":"en"},"email_type_option":true}';
-
+    l_body := '{"name":"'||p_list_name||'","contact":{"company":"'||g_company_name||'","address1":"'||g_address1||'","city":"'||g_city||'","state":"'||g_state||'","zip":"'||g_zip||'","country":"'||g_county||'","phone":""}';
+    l_body := l_body||',"permission_reminder":"'||p_permission_reminder||'","campaign_defaults":{"from_name":"'||g_from_name||'''","from_email":"'||g_reply_to||'","subject":"","language":"en"},"email_type_option":true}';
+    
     logger.log('l_body :'||l_body, l_scope, null, l_params);
 
     l_response := apex_web_service.make_rest_request(
