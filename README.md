@@ -12,7 +12,7 @@ Using MailChimp has many advantages:
 - Sophisticated reporting:
     Access in-depth stats on open-rate, unsubscribe-rate, etc to better understand and serve your intended audience.
 - Easy set-up and maintenance:
-    Obviously this path obviates the need to setup and maintain my own email server. 
+    Obviously this path obviates the need to setup and maintain your own email server. 
 
 
 
@@ -37,11 +37,11 @@ If you get the error 'ORA-24263: Certificate of the remote server does not match
 select apex_web_service.make_rest_request(
       p_url         => 'https://us18.api.mailchimp.com'
     , p_http_method => 'GET' 
-    , p_wallet_path => 'file:/home/oracle/orapki_wallet_nowc' 
+    , p_wallet_path => 'file:[path to your oracle wallet]' 
     , p_https_host  => 'wildcardsan2.mailchimp.com'
     ) from dual;
 ```
-The 'HTTPS Host' refers to the 'Common Name' of the URL you are trying to reach and must now be specified when it does not match the destination URL. See my notes on [solving the ORA-24263 error](docs/Certificate_of_the_remote_server_does_not_match_the_target_address.md). 
+The 'HTTPS Host' refers to the 'Common Name' of the URL you are trying to reach and must now be specified when your API is employing a 'multiple domain certificate'. See my notes on [solving the ORA-24263 error](docs/Certificate_of_the_remote_server_does_not_match_the_target_address.md). 
 
 ## Install Logger
 
@@ -138,7 +138,7 @@ If you're not afraid of HTML and CSS, you can craft your own email template and 
 declare
 l_template_id integer;
 begin
-   mailchimp_pkg.create_template (p_template_name => 'My template name',
+   mailchimp_pkg.create_template (p_template_name => 'Your template name',
                                   p_html          => '<html><body>This is a really basic email.</body></html>',
                                   p_template_id   => l_template_id);
    dbms_output.put_line('Your newly generated template_id is  :'||l_template_id);
