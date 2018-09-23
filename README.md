@@ -43,11 +43,11 @@ select apex_web_service.make_rest_request(
 ```
 The 'HTTPS Host' refers to the 'Common Name' of the URL you are trying to reach and must now be specified when your API is employing a 'multiple domain certificate'. See my notes on [solving the ORA-24263 error](docs/Certificate_of_the_remote_server_does_not_match_the_target_address.md). 
 
-## Install Logger
+## Logger
 
 It would, of course, be perfectly possible to write this PL/SQL package without using Logger. Nonetheless, I am unashamedly dependent on it and would encourage anyone to give it a try before removing all the logger code that I've written. [Installation is simple and the documentation is thorough.](https://github.com/OraOpenSource/Logger)
 
-# Install this git repo
+# Installation
 
 There is not much to be installed just [1 package, 6 types and 3 tables](source/install.sql).
 
