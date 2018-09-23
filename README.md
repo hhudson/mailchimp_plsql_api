@@ -47,11 +47,12 @@ The 'HTTPS Host' refers to the 'Common Name' of the URL you are trying to reach 
 
 It would, of course, be perfectly possible to write this PL/SQL package without using Logger. Nonetheless, I am unashamedly dependent on it and would encourage anyone to give it a try before removing all the logger code that I've written. [Installation is simple and the documentation is thorough.](https://github.com/OraOpenSource/Logger)
 
-# Installation
+# Using the MailChimp API through PL/SQL
+## Installation
 
 There is not much to be installed just [1 package, 6 types and 3 tables](source/install.sql).
 
-# Using the MailChimp API through PL/SQL
+
 ## Create a MailChimp account
 Your 1st step should be to create a free account on [Mailchimp](https://mailchimp.com/).
 ### Get your API Key
