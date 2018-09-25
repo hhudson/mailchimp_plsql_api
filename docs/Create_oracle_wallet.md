@@ -66,6 +66,7 @@ Copyright (c) 2004, 2016, Oracle and/or its affiliates. All rights reserved.
 
 Operation is successfully completed.
 ```
+Note: The above was performed on a 12.2 Oracle Datbase. On as 12.1 Database I got an 'PKI-04001: Invalid Certificate' error with the DigiCertECCSecureServerCA.crt certificate. Ultimately, it didn't matter, the wallet worked fine with only the root certificate.
 
 ### Inspect your wallet's contents
 You can validate the contents of your wallet with the 'display' command:
