@@ -80,6 +80,7 @@ You can create and manage your API keys in the account section of MailChimp:
       <br>
 </h1>
 Note: API keys are sensitive data. Keep yours secure, the one featured in the picture above is no longer a valid one.
+
 ### Determine your URL Prefix
 You'll need to determine your 'URL prefix', as I'm calling it, to use the MailChimp API. You are assigned one when you create an account. I know that I'm 'us18' looking at the URL of MailChimp as a logged-in user. There are probably many ways to determine this.
 
