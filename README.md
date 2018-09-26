@@ -241,7 +241,7 @@ SELECT *
 FROM TABLE(mailchimp_pkg.get_list_of_merge_fields(p_list_id => '[you list_id]'));
 ```
 ## Send your email
-### Generate campaign url
+### Generate your campaign url
 Almost there! Generate the URL for your intended email with the following API:
 ```
 declare
@@ -255,7 +255,7 @@ begin
    dbms_output.put_line('Your email is ready to send with the following url :'l_send_url);
 end;
 ```
-### Send campaign
+### Send your 'campaign'
 Take that URL and simply plug it into the following:
 ```
 declare
