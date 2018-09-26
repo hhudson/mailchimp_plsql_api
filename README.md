@@ -45,7 +45,9 @@ The 'HTTPS Host' refers to the 'Common Name' of the URL you are trying to reach 
 
 ## Compatibility
 
-The json functions I leverage require at least a 12.2 database. It, however, be simple to adapt them for a 12.1 environment. For example:
+The json functions I leverage require at least a 12.2 database and APEX 5.1.4. It should, nonetheless, be simple to adapt them for a lower environment. 
+
+For example:
 ```
 l_list_id := json_value(l_response, '$.id');
 ```
@@ -55,6 +57,7 @@ select json_value(l_response, '$.id')
 into l_list_id
 from dual;
 ```
+
 
 ## Logger
 
