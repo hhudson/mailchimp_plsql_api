@@ -224,8 +224,6 @@ begin
     logger.append_param(l_params, 'p_list_id', p_list_id);
     logger.append_param(l_params, 'p_merge_field_tag', p_merge_field_tag);
     logger.append_param(l_params, 'p_merge_field_name', p_merge_field_name);
-    logger.append_param(l_params, 'p_merge_id', p_merge_id);
-    logger.append_param(l_params, 'p_tag', p_tag);
     logger.log('START', l_scope, null, l_params);
 
     if length(p_merge_field_tag) > 10 then
