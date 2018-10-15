@@ -246,8 +246,12 @@ begin
     p_merge_id := json_value(l_response, '$.merge_id');
     p_tag      := json_value(l_response, '$.tag');
 
-    logger.log('p_merge_id :'||p_merge_id, l_scope, null, l_params);
-    logger.log('p_tag :'||p_tag, l_scope, null, l_params);
+    if p_merge_id is null then
+        logger.log_error('Unhandled Error :'||l_response, l_scope, null, l_params);
+    else 
+        logger.log('p_merge_id :'||p_merge_id, l_scope, null, l_params);
+        logger.log('p_tag :'||p_tag, l_scope, null, l_params);
+    end if;
 
     logger.log('END', l_scope);
 exception when others then 
