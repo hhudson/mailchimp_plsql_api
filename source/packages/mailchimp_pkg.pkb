@@ -120,7 +120,7 @@ begin
   logger.log('START', l_scope, null, l_params);
   
   l_response:= apex_web_service.make_rest_request(
-                  p_url         => g_url_prefix||'/lists/'||p_list_id||'/members/'
+                  p_url         => g_url_prefix||'/lists/'||p_list_id||'/members?offset=0&count=100'
                 , p_http_method => 'GET'
                 , p_username    => g_username
                 , p_password    => g_password

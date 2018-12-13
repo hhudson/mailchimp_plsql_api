@@ -143,7 +143,7 @@ end;
 If at any point you lose track of who you've added to your list, you can query it as follows:
 ```
 SELECT * 
-FROM TABLE(FUNCTION get_list_of_subscribers ( p_list_id => '[you list_id]'));
+FROM TABLE(blog_mailchimp_pkg.get_list_of_subscribers ( p_list_id => '[you list_id]'));
 ```
 ## Prepare your email
 ## Create an email template
