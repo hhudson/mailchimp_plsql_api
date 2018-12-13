@@ -12,6 +12,11 @@ procedure add_subscriber (  p_list_id in varchar2, --- the id of the list you ar
                             p_lname   in varchar2, --- the last name of this subscriber
                             p_success out boolean); -- a confirmation of that adding the subscriber was successful
 
+-- delete subscriber from list
+procedure remove_subscriber ( p_list_id in varchar2, --- the id of the list you are adding a subscriber to
+                              p_email   in varchar2, --- the email of the subscriber you want to remove
+                              p_success out boolean); -- a confirmation of that removing the subscriber was successful
+
 --print list of subscribers
 function get_list_of_subscribers ( p_list_id in varchar2) -- the email list_id
                                    return subscriber_typ_set PIPELINED;
