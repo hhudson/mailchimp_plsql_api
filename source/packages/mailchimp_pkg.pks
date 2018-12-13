@@ -1,4 +1,4 @@
-create or replace package blog_mailchimp_pkg as 
+create or replace package mailchimp_pkg as 
 
 --create a new mailing list
 function create_list (p_list_name           in varchar2, --- the name you want to give your new mailing list
@@ -58,7 +58,5 @@ procedure send_campaign (p_send_url in varchar2, ---- the URL of the email you w
 function get_campaign_history return campaign_history_typ_set PIPELINED;
 
 
-
-
-end blog_mailchimp_pkg;
+end mailchimp_pkg;
 /

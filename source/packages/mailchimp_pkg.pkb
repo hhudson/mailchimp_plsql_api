@@ -1,4 +1,4 @@
-create or replace package body blog_mailchimp_pkg as 
+create or replace package body mailchimp_pkg as 
     
     gc_scope_prefix constant varchar2(31) := lower($$plsql_unit) || '.'; ---------------- necessary for the logger implementation
     g_url_prefix    constant varchar2(100):= 'https://us[XX].api.mailchimp.com/3.0/'; --- your Mailchimp url prefix
@@ -536,5 +536,5 @@ exception when others then
     raise;
 end get_campaign_history;
 
-end blog_mailchimp_pkg;
+end mailchimp_pkg;
 /
