@@ -2,9 +2,8 @@ create or replace package body mailchimp_pkg as
     
     gc_scope_prefix constant varchar2(31) := lower($$plsql_unit) || '.'; ---------------- necessary for the logger implementation
     g_url_prefix    constant varchar2(100):= 'https://us[XX].api.mailchimp.com/3.0/'; --- your Mailchimp url prefix
-    g_username      constant varchar2(50) := 'admin'; ----------------------------------- arbitrary - can be anything
     g_password      constant varchar2(50) := '[your MailChimp API Key]'; ---------------- this is your API Key (very sensitive - keep to yourself)
-    g_wallet_path   constant varchar2(100):= 'file:[path to your Oracle Wallet]'; ------- the path on to your Oracle Wallet
+    g_wallet_path   constant varchar2(100) := 'file:[path to your Oracle Wallet]'; ------- the path on to your Oracle Wallet
     g_https_host    constant varchar2(100):= 'wildcardsan2.mailchimp.com'; -------------- necessary if you have an Oracle 12.2 database or higher (see instructions)
     g_address1      constant varchar2(500):= '27 West St'; ------------------------------ The CAN SPAM act requires that you specify the organization's address
     g_city          constant varchar2(500):= 'Cambridge'; ------------------------------- The CAN SPAM act requires that you specify the organization's address
@@ -14,6 +13,7 @@ create or replace package body mailchimp_pkg as
     g_company_name  constant varchar2(100):= 'My Company'; ------------------------------ whatever your organization is called
     g_reply_to      constant varchar2(100):= 'hhudson@insum.ca'; ------------------------ the email that you've authenticated with Mailchimp
     g_from_name     constant varchar2(100):= 'Hayden Hudson'; --------------------------- the name your emails will appear to be from
+    g_username      constant varchar2(50) := 'admin'; ----------------------------------- arbitrary - can be anything
 
 -- see package specs
 function create_list (p_list_name           in varchar2, 
@@ -34,7 +34,7 @@ begin
     l_body := '{"name":"'||p_list_name||'","contact":{"company":"'||g_company_name||'","address1":"'||g_address1||'","city":"'||g_city||'","state":"'||g_state||'","zip":"'||g_zip||'","country":"'||g_county||'","phone":""}';
     l_body := l_body||',"permission_reminder":"'||p_permission_reminder||'","campaign_defaults":{"from_name":"'||g_from_name||'''","from_email":"'||g_reply_to||'","subject":"","language":"en"},"email_type_option":true}';
     
-    logger.log('l_body :'||l_body, l_scope, null, l_params);
+    logger.log('l_body :', l_scope, l_body);
 
     l_response := apex_web_service.make_rest_request(
           p_url         => g_url_prefix||'/lists/'
@@ -48,8 +48,8 @@ begin
 
     l_list_id := json_value(l_response, '$.id');
 
-    logger.log('list id :'    ||l_list_id , l_scope, null, l_params);
-    logger.log('l_response : '||l_response, l_scope, null, l_params);
+    logger.log('list id :'    , l_scope, l_list_id);
+    logger.log('l_response : ', l_scope, l_response);
 
   logger.log('END', l_scope);
   return l_list_id;
@@ -72,6 +72,9 @@ l_response     clob;
 l_confirmation varchar2(1000);
 begin
     logger.append_param(l_params, 'p_list_id', p_list_id);
+    logger.append_param(l_params, 'p_email', p_email);
+    logger.append_param(l_params, 'p_fname', p_fname);
+    logger.append_param(l_params, 'p_lname', p_lname);
     logger.log('START', l_scope, null, l_params);
 
     l_body := '{"email_address":"'||p_email||'","status":"subscribed","merge_fields":{"FNAME":"'||p_fname||'","LNAME":"'||p_lname||'"}}';
@@ -91,10 +94,10 @@ begin
 
     if l_confirmation = 'subscribed' then
         p_success := true;
-        logger.log('Success! :'||l_confirmation, l_scope, null, l_params);
+        logger.log('Success! :', l_scope, l_confirmation);
     else 
         p_success := false;
-        logger.log('Failure :'||l_response, l_scope, null, l_params);
+        logger.log('Failure :', l_scope, l_response);
     end if;
 
     logger.log('END', l_scope);
@@ -103,7 +106,53 @@ exception when others then
     raise;
 end add_subscriber;
 
--- see pacakge specs
+-- see package specs
+procedure remove_subscriber ( p_list_id in varchar2, 
+                              p_email   in varchar2, 
+                              p_success out boolean)
+is 
+l_scope           logger_logs.scope%type := gc_scope_prefix || 'remove_subscriber';
+l_params          logger.tab_param;
+l_response        clob;
+l_subscriber_hash varchar2(200);
+l_confirmation    varchar2(1000);
+l_count           number;
+begin
+    logger.append_param(l_params, 'p_list_id', p_list_id);
+    logger.append_param(l_params, 'p_email', p_email);
+    logger.log('START', l_scope, null, l_params);
+
+    select standard_hash(p_email, 'MD5')
+    into l_subscriber_hash
+    from dual;
+
+    l_response := apex_web_service.make_rest_request(
+                  p_url         => g_url_prefix||'/lists/'||p_list_id||'/members/'||l_subscriber_hash
+                , p_http_method => 'DELETE'
+                , p_username    => g_username
+                , p_password    => g_password
+                , p_wallet_path => g_wallet_path
+                , p_https_host  => g_https_host
+            );
+
+    SELECT count(*)
+        into l_count
+        from table(mailchimp_pkg.get_list_of_subscribers ( p_list_id => p_list_id))
+        where email_address = p_email;
+    
+    if l_count = 0 then
+        p_success := true;
+    else 
+        p_success := false;
+    end if;
+    
+    logger.log('END', l_scope);
+exception when others then 
+    logger.log_error('Unhandled Exception', l_scope, null, l_params); 
+    raise;
+end remove_subscriber;
+
+-- see package specs
 function get_list_of_subscribers ( p_list_id in varchar2) -- the email list_id
                                    RETURN subscriber_typ_set PIPELINED
 is 
@@ -120,7 +169,7 @@ begin
   logger.log('START', l_scope, null, l_params);
   
   l_response:= apex_web_service.make_rest_request(
-                  p_url         => g_url_prefix||'/lists/'||p_list_id||'/members?offset=0&count=100'
+                  p_url         => g_url_prefix||'/lists/'||p_list_id||'/members?offset=0&count=10000'
                 , p_http_method => 'GET'
                 , p_username    => g_username
                 , p_password    => g_password
@@ -129,7 +178,7 @@ begin
             );
 
   l_total_items := json_value(l_response, '$.total_items');
-  logger.log('l_total_items :'||l_total_items, l_scope, null, l_params);
+  logger.log('l_total_items :', l_scope, to_char(l_total_items));
 
   for i in 1..l_total_items 
   loop
@@ -183,7 +232,7 @@ begin
             );
 
     l_total_items := json_value(l_response, '$.total_items');
-    logger.log('l_total_items :'||l_total_items, l_scope, null, l_params);
+    logger.log('l_total_items :', l_scope, to_char(l_total_items));
 
     for i in 1..l_total_items 
     loop
@@ -227,7 +276,7 @@ begin
     logger.log('START', l_scope, null, l_params);
 
     if length(p_merge_field_tag) > 10 then
-        logger.log_error('p_merge_field_tag cannot be more than 10 characters;', l_scope, null, l_params);
+        logger.log_error('p_merge_field_tag cannot be more than 10 characters.', l_scope, null, l_params);
         raise_application_error(-20456, 'Merge field too long');
     end if;
 
@@ -247,10 +296,10 @@ begin
     p_tag      := json_value(l_response, '$.tag');
 
     if p_merge_id is null then
-        logger.log_error('Unhandled Error :'||l_response, l_scope, null, l_params);
+        logger.log_error('Unhandled Error :', l_scope, l_response);
     else 
-        logger.log('p_merge_id :'||p_merge_id, l_scope, null, l_params);
-        logger.log('p_tag :'||p_tag, l_scope, null, l_params);
+        logger.log('p_merge_id :', l_scope, to_char(p_merge_id));
+        logger.log('p_tag :'     , l_scope, p_tag);
     end if;
 
     logger.log('END', l_scope);
@@ -280,7 +329,7 @@ begin
     begin
       select merge_id
         into l_merge_id 
-        from table(blog_mailchimp_pkg.get_list_of_merge_fields(p_list_id => p_list_id))
+        from table(mailchimp_pkg.get_list_of_merge_fields(p_list_id => p_list_id))
         where tag = p_merge_field_tag;
     exception when no_data_found then
       logger.log_error('Tag does not exist in this list. It must be created 1st.', l_scope, null, l_params); 
@@ -304,10 +353,10 @@ begin
 
     if l_confirmation = p_merge_value then
         p_success := true;
-        logger.log('Successfully updated merge field to :'||l_confirmation, l_scope, null, l_params);
+        logger.log('Successfully updated merge field to :', l_scope, l_confirmation);
     else 
         p_success := false;
-        logger.log('Failure :'||l_confirmation, l_scope, null, l_params);
+        logger.log('Failure :', l_scope, l_confirmation);
     end if;
 
 
@@ -342,7 +391,7 @@ begin
             );
     
     p_template_id := json_value(l_response, '$.id');
-    logger.log('p_template_id :'||p_template_id, l_scope, null, l_params);
+    logger.log('p_template_id :', l_scope, to_char(p_template_id));
 
   logger.log('END', l_scope);
 exception when others then 
@@ -424,9 +473,9 @@ begin
                 );
 
     l_campaign_id := json_value(l_response, '$.id');
-    logger.log('l_campaign_id :'||l_campaign_id, l_scope, null, l_params);
+    logger.log('l_campaign_id :', l_scope, l_campaign_id);
     p_send_url := json_value(l_response, '$."_links"[3].href');
-    logger.log('p_send_url :'||p_send_url, l_scope, null, l_params);
+    logger.log('p_send_url :', l_scope, p_send_url);
 
     logger.log('END', l_scope);
 exception when others then 
@@ -459,7 +508,7 @@ begin
         logger.log('Success!', l_scope, null, l_params);
     else 
         p_success := false;
-        logger.log('l_response :'||l_response, l_scope, null, l_params);
+        logger.log('l_response :', l_scope, l_response);
     end if;
 
     logger.log('END', l_scope);
@@ -492,7 +541,7 @@ begin
             );
 
     l_total_items := json_value(l_response, '$.total_items');
-    logger.log('l_total_items :'||l_total_items, l_scope, null, l_params);
+    logger.log('l_total_items :', l_scope, to_char(l_total_items));
 
     for i in 1..l_total_items 
   loop
