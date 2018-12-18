@@ -62,6 +62,8 @@ procedure send_campaign (p_send_url in varchar2, ---- the URL of the email you w
 -- get history of all campaigns
 function get_campaign_history return campaign_history_typ_set PIPELINED;
 
+--retrieve environment variables written to the database
+function get_env_var (p_var_name in varchar2) return varchar2;
 
 end mailchimp_pkg;
 /

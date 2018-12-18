@@ -585,5 +585,30 @@ exception when others then
     raise;
 end get_campaign_history;
 
+function get_env_var (p_var_name in varchar2)
+is 
+l_scope   logger_logs.scope%type := gc_scope_prefix || 'get_env_var';
+l_params  logger.tab_param;
+l_var_val varchar2(200);
+begin 
+    logger.append_param(l_params, 'p_var_name', p_var_name);
+    logger.log('START', l_scope, null, l_params);
+
+    select variable_value
+        into l_var_val
+        from mailchimp_env_var
+        where upper(variable_name) = upper(p_var_name);
+
+    logger.log('END', l_scope);
+    return l_var_val;
+exception 
+    when no_data_found then
+        logger.log_error('Variable name not recognized.', l_scope, null, l_params); 
+        raise;
+    when others then 
+        logger.log_error('Unhandled Exception', l_scope, null, l_params); 
+        raise;
+end get_env_var;
+
 end mailchimp_pkg;
 /
