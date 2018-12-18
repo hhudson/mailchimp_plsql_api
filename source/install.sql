@@ -7,6 +7,7 @@
 @types/campaign_history_typ.sql;
 @types/campaign_history_typ_set.sql;
 @tables/campaign_history_typ_tbl.sql;
+@tables/mailchimp_env_var.sql;
 @packages/mailchimp_pkg.pks;
 set define off;
 @packages/mailchimp_pkg.pkb;
