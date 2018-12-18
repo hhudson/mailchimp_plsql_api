@@ -1,19 +1,19 @@
 create or replace package body mailchimp_pkg as 
     
-    gc_scope_prefix constant varchar2(31) := lower($$plsql_unit) || '.'; ---------------- necessary for the logger implementation
-    g_url_prefix    constant varchar2(100):= 'https://us[XX].api.mailchimp.com/3.0/'; --- your Mailchimp url prefix
-    g_password      constant varchar2(50) := '[your MailChimp API Key]'; ---------------- this is your API Key (very sensitive - keep to yourself)
-    g_wallet_path   constant varchar2(100) := 'file:[path to your Oracle Wallet]'; ------- the path on to your Oracle Wallet
-    g_https_host    constant varchar2(100):= 'wildcardsan2.mailchimp.com'; -------------- necessary if you have an Oracle 12.2 database or higher (see instructions)
-    g_address1      constant varchar2(500):= '27 West St'; ------------------------------ The CAN SPAM act requires that you specify the organization's address
-    g_city          constant varchar2(500):= 'Cambridge'; ------------------------------- The CAN SPAM act requires that you specify the organization's address
-    g_state         constant varchar2(500):= 'MA'; -------------------------------------- The CAN SPAM act requires that you specify the organization's address
-    g_zip           constant varchar2(500):= '02139'; ----------------------------------- The CAN SPAM act requires that you specify the organization's address
-    g_county        constant varchar2(500):= 'U.S.A.'; ---------------------------------- The CAN SPAM act requires that you specify the organization's address
-    g_company_name  constant varchar2(100):= 'My Company'; ------------------------------ whatever your organization is called
-    g_reply_to      constant varchar2(100):= 'hhudson@insum.ca'; ------------------------ the email that you've authenticated with Mailchimp
-    g_from_name     constant varchar2(100):= 'Hayden Hudson'; --------------------------- the name your emails will appear to be from
-    g_username      constant varchar2(50) := 'admin'; ----------------------------------- arbitrary - can be anything
+    gc_scope_prefix constant varchar2(31)  := lower($$plsql_unit) || '.'; ---------------- necessary for the logger implementation
+    g_url_prefix    constant varchar2(100) := 'https://us[XX].api.mailchimp.com/3.0/'; --- your Mailchimp url prefix
+    g_password      constant varchar2(50)  := get_env_var (p_var_name => 'api_key'); ----- this is your API Key (very sensitive - keep to yourself)
+    g_wallet_path   constant varchar2(100);   --------------------------------------------  the path on to your Oracle Wallet, syntax 'file:[path to your Oracle Wallet]'
+    g_https_host    constant varchar2(100) := 'wildcardsan2.mailchimp.com'; -------------- necessary if you have an Oracle 12.2 database or higher (see instructions)
+    g_address1      constant varchar2(500) := '27 West St'; ------------------------------ The CAN SPAM act requires that you specify the organization's address
+    g_city          constant varchar2(500) := 'Cambridge'; ------------------------------- The CAN SPAM act requires that you specify the organization's address
+    g_state         constant varchar2(500) := 'MA'; -------------------------------------- The CAN SPAM act requires that you specify the organization's address
+    g_zip           constant varchar2(500) := '02139'; ----------------------------------- The CAN SPAM act requires that you specify the organization's address
+    g_county        constant varchar2(500) := 'U.S.A.'; ---------------------------------- The CAN SPAM act requires that you specify the organization's address
+    g_company_name  constant varchar2(100) := 'My Company'; ------------------------------ whatever your organization is called
+    g_reply_to      constant varchar2(100) := 'hhudson@insum.ca'; ------------------------ the email that you've authenticated with Mailchimp
+    g_from_name     constant varchar2(100) := 'Hayden Hudson'; --------------------------- the name your emails will appear to be from
+    g_username      constant varchar2(50)  := 'admin'; ----------------------------------- arbitrary - can be anything
 
 -- see package specs
 function create_list (p_list_name           in varchar2, 
