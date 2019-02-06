@@ -265,10 +265,23 @@ procedure create_merge_field(p_list_id          in varchar2,
                              p_merge_id         out integer,
                              p_tag              out varchar2)
 is 
-l_scope    logger_logs.scope%type := gc_scope_prefix || 'create_merge_field';
-l_params   logger.tab_param;
-l_body     varchar2(1000);
-l_response varchar2(2000);
+l_scope     logger_logs.scope%type := gc_scope_prefix || 'create_merge_field';
+l_params    logger.tab_param;
+l_body      varchar2(1000);
+l_response  varchar2(2000);
+l_tag_count number;
+    procedure check_if_already_there is 
+    begin
+        SELECT     merge_id,   tag
+            INTO p_merge_id, p_tag
+            FROM TABLE(mailchimp_pkg.get_list_of_merge_fields(p_list_id => p_list_id))
+            where tag = p_merge_field_tag;
+            logger.log('The tag already exists in this list.', l_scope, null, l_params);
+            logger.log('p_merge_id :', l_scope, to_char(p_merge_id));
+            logger.log('p_tag :'     , l_scope, p_tag);
+        exception when no_data_found then
+            logger.log('The tag does not exist yet in this list', l_scope, null, l_params);
+    end check_if_already_there;
 begin 
     logger.append_param(l_params, 'p_list_id', p_list_id);
     logger.append_param(l_params, 'p_merge_field_tag', p_merge_field_tag);
@@ -279,6 +292,9 @@ begin
         logger.log_error('p_merge_field_tag cannot be more than 10 characters.', l_scope, null, l_params);
         raise_application_error(-20456, 'Merge field too long');
     end if;
+
+    check_if_already_there;
+    if p_merge_id is not null then return; end if;
 
     l_body := '{"tag":"'||p_merge_field_tag||'", "name":"'||p_merge_field_name||'", "type":"text"}';
 
