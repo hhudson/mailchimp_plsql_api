@@ -32,7 +32,7 @@ begin
   logger.log('START', l_scope, null, l_params);
 
     l_body := '{"name":"'||p_list_name||'","contact":{"company":"'||g_company_name||'","address1":"'||g_address1||'","city":"'||g_city||'","state":"'||g_state||'","zip":"'||g_zip||'","country":"'||g_county||'","phone":""}';
-    l_body := l_body||',"permission_reminder":"'||p_permission_reminder||'","campaign_defaults":{"from_name":"'||g_from_name||'''","from_email":"'||g_reply_to||'","subject":"","language":"en"},"email_type_option":true}';
+    l_body := l_body||',"permission_reminder":"'||p_permission_reminder||'","campaign_defaults":{"from_name":"'||g_from_name||'","from_email":"'||g_reply_to||'","subject":"","language":"en"},"email_type_option":true}';
     
     logger.log('l_body :', l_scope, l_body);
 
