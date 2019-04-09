@@ -52,7 +52,13 @@ procedure create_campaign ( p_list_id      in varchar2, ----- the list_id that s
                             p_subject_line in varchar2, ----- the subject line of your email
                             p_title        in varchar2, ----- a title for your administrative purposes
                             p_template_id  in number, ------- the template the email should use
+                            p_campaign_id  out varchar2, ---- then unique id of the newly created campaign
                             p_send_url     out varchar2); --- the URL of the as-yet unsent email
+
+--see if campaign is ready to be sent
+procedure send_campaign_checklist (p_campaign_id in varchar2, --- the unique id of the campaign
+                                   p_ready       out boolean); -- a confirmation of whether or not it is ready to be sent
+
 
 --send email campaign
 procedure send_campaign (p_send_url in varchar2, ---- the URL of the email you wish to send (see above)

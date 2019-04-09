@@ -460,6 +460,7 @@ procedure create_campaign ( p_list_id      in varchar2,
                             p_subject_line in varchar2,
                             p_title        in varchar2,
                             p_template_id  in number,
+                            p_campaign_id  out varchar2,
                             p_send_url     out varchar2)
 is
 l_scope       logger_logs.scope%type := gc_scope_prefix || 'create_campaign'; 
@@ -490,6 +491,7 @@ begin
 
     l_campaign_id := json_value(l_response, '$.id');
     logger.log('l_campaign_id :', l_scope, l_campaign_id);
+    p_campaign_id := l_campaign_id;
     p_send_url := json_value(l_response, '$."_links"[3].href');
     logger.log('p_send_url :', l_scope, p_send_url);
 
@@ -498,6 +500,41 @@ exception when others then
     logger.log_error('Unhandled Exception', l_scope, null, l_params);
     raise;
 end create_campaign;
+
+--see package specs
+procedure send_campaign_checklist (p_campaign_id in varchar2, --- the unique id of the campaign
+                                   p_ready       out boolean)
+is 
+l_scope    logger_logs.scope%type := gc_scope_prefix || 'send_campaign_checklist';
+l_params   logger.tab_param;
+l_response clob;
+l_ready    varchar2(10);
+begin
+  logger.append_param(l_params, 'p_campaign_id', p_campaign_id);
+  logger.log('START', l_scope, null, l_params);
+
+  l_response:= apex_web_service.make_rest_request(
+                  p_url         => g_url_prefix||'/campaigns/'||p_campaign_id||'/send-checklist'
+                , p_http_method => 'GET'
+                , p_username    => g_username
+                , p_password    => g_password
+                , p_wallet_path => g_wallet_path
+                , p_https_host  => g_https_host
+            );
+   l_ready := json_value(l_response, '$.is_ready');
+   if l_ready = 'true' then
+      logger.log('The campaign is ready to send.', l_scope, null, l_params);
+      p_ready := true;
+    else 
+      logger.log('The campaign is not ready to send.', l_scope, l_response);
+      p_ready := false;
+    end if;
+
+  logger.log('END', l_scope);
+exception when others then 
+  logger.log_error('Unhandled Exception', l_scope, null, l_params); 
+  raise;
+end send_campaign_checklist;
 
 -- see package specs
 procedure send_campaign (p_send_url in varchar2,
@@ -519,7 +556,7 @@ begin
                         , p_https_host  => g_https_host
                     );
     
-    if length(l_response) = 0 then
+    if length(l_response) = 0 or l_response is null then
         p_success := true;
         logger.log('Success!', l_scope, null, l_params);
     else 
