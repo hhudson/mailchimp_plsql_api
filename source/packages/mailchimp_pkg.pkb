@@ -657,7 +657,7 @@ begin
     return l_var_val;
 exception 
     when no_data_found then
-        logger.log_error('Variable name not recognized.', l_scope, null, l_params); 
+        --logger.log_error('Variable name not recognized.', l_scope, null, l_params); 
         return null;
     when others then 
         logger.log_error('Unhandled Exception', l_scope, null, l_params); 
